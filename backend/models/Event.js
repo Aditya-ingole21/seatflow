@@ -1,51 +1,58 @@
-const moongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-const eventSchema = new moongoose.Schema({
-    title:{
+const eventSchema = new mongoose.Schema({
+    title: {
         type: String,
-        required: true,
+        required: [true, 'Title is required'],
         trim: true
-
     },
     description: {
         type: String,
-        required: true,
+        required: [true, 'Description is required'],
         trim: true
     },
     date: {
         type: Date,
-        required: true
-    },
-    location:  {    
-        type: String,
-        required: true,
-        trim: true
+        required: [true, 'Event date is required']
     },
     category: {
         type: String,
-        required: true,
+        required: [true, 'Category is required'],
+        enum: ['Conference', 'Workshop', 'Concert', 'Sports', 'Tech', 'Cultural', 'Other'],
         trim: true
-    },price:{
-        type: Number,
-        required: true,
-        min: 0
     },
-    capacity:{
-        type: Number,
-        required: true,
-        min: 1
+    location: {
+        type: String,
+        required: [true, 'Location is required'],
+        trim: true
     },
-    bookedSeats: {
+    price: {
         type: Number,
-        default: 0, 
+        required: [true, 'Price is required'],
+        min: [0, 'Price cannot be negative']
+    },
+    capacity: {
+        type: Number,
+        required: [true, 'Capacity is required'],
+        min: [1, 'Capacity must be at least 1']
+    },
+    bookedCount: {
+        type: Number,
+        default: 0
     },
     createdBy: {
-        type: moongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    },
+    }
 }, {
     timestamps: true
 });
 
-module.exports = moongoose.model('Event', eventSchema);
+
+eventSchema.virtual('remainingSeats').get(function () {
+    return this.capacity - this.bookedCount;
+});
+
+
+module.exports = mongoose.model('Event', eventSchema);

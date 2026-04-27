@@ -1,34 +1,33 @@
-const moongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-const bookingSchema = new moongoose.Schema({
-    event: {
-        type: moongoose.Schema.Types.ObjectId,
-        ref: 'Event',
-        required: true
-    },
+const bookingSchema = new mongoose.Schema({
     user: {
-        type: moongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
-
-},
-    seats: {
+        required: [true, 'User is required']
+    },
+    event: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
+        required: [true, 'Event is required']
+    },
+    quantity: {
         type: Number,
-        required: true,
-        min: 1
+        required: [true, 'Quantity is required'],
+        min: [1, 'Quantity must be at least 1']
     },
     totalPrice: {
         type: Number,
-        required: true, 
-        min: 0
+        required: [true, 'Total price is required'],
+        min: [0, 'Total price cannot be negative']
     },
     status: {
         type: String,
-        enum: ['booked', 'cancelled'],
-        default: 'booked'
+        enum: ['confirmed', 'cancelled'],
+        default: 'confirmed'
     }
 }, {
     timestamps: true
 });
 
-module.exports = moongoose.model('Booking', bookingSchema);
+module.exports = mongoose.model('Booking', bookingSchema);
