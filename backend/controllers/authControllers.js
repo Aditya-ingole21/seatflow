@@ -1,13 +1,13 @@
-const User = require('../models/user');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
-const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
-
+// register a new user
+const registerUser = async (req, res, next) => {
     try {
-        
+        const { name, email, password } = req.body;
+
+        // check if user already exists
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({
@@ -16,18 +16,17 @@ const registerUser = async (req, res) => {
             });
         }
 
-        
+        // hash the password before saving
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        
         const user = await User.create({
             name,
             email: email.toLowerCase(),
             password: hashedPassword
         });
 
-        
+        // generate jwt token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: '30d'
         });
@@ -44,26 +43,24 @@ const registerUser = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        next(error);
     }
 };
 
-
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
-
+// login user
+const loginUser = async (req, res, next) => {
     try {
+        const { email, password } = req.body;
+
         const user = await User.findOne({ email: email.toLowerCase() });
 
-        if (user && await bcrypt.compare(password, user.password)) {
+        // check if user exists and password matches
+        if (user && (await bcrypt.compare(password, user.password))) {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
                 expiresIn: '30d'
             });
 
-            res.json({
+            res.status(200).json({
                 success: true,
                 data: {
                     _id: user._id,
@@ -79,12 +76,23 @@ const loginUser = async (req, res) => {
                 message: 'Invalid email or password'
             });
         }
+
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        next(error);
     }
 };
 
-module.exports = { registerUser, loginUser };
+// get currently logged in user profile
+const getMe = async (req, res, next) => {
+    try {
+        // req.user is already set by the protect middleware
+        res.status(200).json({
+            success: true,
+            data: req.user
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { registerUser, loginUser, getMe };
