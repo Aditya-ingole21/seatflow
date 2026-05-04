@@ -1,4 +1,4 @@
-import { Ticket, Twitter, Github, Linkedin, Instagram } from 'lucide-react';
+import { Ticket, Link as LinkIcon, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -18,16 +18,10 @@ const Footer = () => {
             </p>
             <div className="flex gap-4">
               <a href="#" className="p-2 glass rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                <Twitter className="w-5 h-5" />
+                <LinkIcon className="w-5 h-5" />
               </a>
               <a href="#" className="p-2 glass rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="p-2 glass rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                <Github className="w-5 h-5" />
-              </a>
-              <a href="#" className="p-2 glass rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                <Linkedin className="w-5 h-5" />
+                <MessageCircle className="w-5 h-5" />
               </a>
             </div>
           </div>
